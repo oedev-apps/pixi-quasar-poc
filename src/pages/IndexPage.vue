@@ -12,16 +12,88 @@ import { defineComponent } from 'vue'
 import { Screen } from 'quasar';
 import * as PIXI from 'pixi.js';
 
-const app = new PIXI.Application({ width: Screen.width - 2, height: Screen.height - 2 });
+const xMax = Screen.width - 2;
+const yMax = Screen.height - 2;
+const xMid = xMax / 2;
+const yMid = yMax / 2;
+
+const app = new PIXI.Application({ width: xMax, height: yMax });
 const sprite = PIXI.Sprite.from('sample.png');
 sprite.anchor.set(0.5);
-sprite.x = app.screen.width / 2;
-sprite.y = app.screen.height / 2;
+sprite.x = xMid;
+sprite.y = yMid;
 sprite.scale.x = 0.25;
 sprite.scale.y = 0.25;
 let elapsed = 0.0;
 let uiUpdate = 1;
 document.body.style.backgroundColor = 'black';
+
+// Sprite movement states
+// let currentState = 0;
+// const spriteStates = [
+//   delta => {
+//     // Inital movement from center
+//     if (sprite.y < 5) {
+//       currentState = 1;
+//       spriteStates[currentState](delta);
+//       return;
+//     }
+//     if (sprite.y < 50) {
+//       sprite.angle += -delta;
+//       sprite.y += -delta * 0.5;
+//       return;
+//     }
+//     sprite.y += -delta;
+//   },
+//   delta => {
+//     // Move to left side
+//     if (sprite.angle > -180) {
+//       sprite.angle += -delta * .5;
+//     }
+//     if (sprite.x > 25) {
+//       sprite.x += -delta;
+//     }
+//     if (sprite.y < Screen.height / 2) {
+//       sprite.y += delta;
+//     }
+//     if (sprite.y >= Screen.height / 2 ) {
+//       currentState = 2;
+//       spriteStates[currentState](delta);
+//     }
+//   },
+//   delta => {
+//     // Move to bottom
+//   }
+// ]
+
+let moveState = 0;
+const move = [
+  delta => {
+    if (sprite.x <= 25 && sprite.y >= yMid) {
+      moveState = 1;
+      move[moveState](delta);
+      return;
+    }
+    sprite.x = sprite.x > 25 ? sprite.x - delta : sprite.x;
+    sprite.y = sprite.y < yMid ? sprite.y + delta : sprite.y;
+  },
+  delta => {
+    if (sprite.x >= xMid && sprite.y >= yMax - 25) {
+      moveState = 2;
+      move[moveState](delta);
+      return;
+    }
+    sprite.x = sprite.x < xMid ? sprite.x + delta : sprite.x;
+    sprite.y = sprite.y < yMax - 25 ? sprite.y + delta : sprite.y;
+  },
+  delta => {
+
+  }
+]
+let rotateState = 0;
+const rotate = [
+  delta => {}
+]
 
 export default defineComponent({
   name: 'IndexPage',
@@ -47,7 +119,8 @@ export default defineComponent({
         uiUpdate++;
       }
       // Move the Sprite
-      sprite.y = Math.max(sprite.y - 1, 0);
+      move[moveState](delta);
+      rotate[rotateState](delta);
     });
   },
   methods: {
