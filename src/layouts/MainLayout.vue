@@ -1,7 +1,7 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
+  <q-layout view="hHh lpR fFf">
+    <q-header style="background-color: rgba(0, 0, 0, 0);">
+      <q-toolbar style="background-color: rgba(0, 0, 0, 0);">
         <q-btn
           flat
           dense
@@ -11,11 +11,9 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title>
-          Quasar App
+        <q-toolbar-title class="text-h6">
+          Pixi.js in a Quasar app
         </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
@@ -39,7 +37,7 @@
       </q-list>
     </q-drawer>
 
-    <q-page-container>
+    <q-page-container style="padding-top: 0px !important;">
       <router-view />
     </q-page-container>
   </q-layout>
