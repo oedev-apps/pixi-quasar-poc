@@ -21,7 +21,7 @@ const app = new PIXI.Application({ width: xMax, height: yMax });
 const sprite = PIXI.Sprite.from('sample.png');
 sprite.anchor.set(0.5);
 sprite.x = xMid;
-sprite.y = yMid;
+sprite.y = 25;
 sprite.scale.x = 0.25;
 sprite.scale.y = 0.25;
 let elapsed = 0.0;
@@ -29,65 +29,43 @@ let uiUpdate = 1;
 document.body.style.backgroundColor = 'black';
 
 // Sprite movement states
-// let currentState = 0;
-// const spriteStates = [
-//   delta => {
-//     // Inital movement from center
-//     if (sprite.y < 5) {
-//       currentState = 1;
-//       spriteStates[currentState](delta);
-//       return;
-//     }
-//     if (sprite.y < 50) {
-//       sprite.angle += -delta;
-//       sprite.y += -delta * 0.5;
-//       return;
-//     }
-//     sprite.y += -delta;
-//   },
-//   delta => {
-//     // Move to left side
-//     if (sprite.angle > -180) {
-//       sprite.angle += -delta * .5;
-//     }
-//     if (sprite.x > 25) {
-//       sprite.x += -delta;
-//     }
-//     if (sprite.y < Screen.height / 2) {
-//       sprite.y += delta;
-//     }
-//     if (sprite.y >= Screen.height / 2 ) {
-//       currentState = 2;
-//       spriteStates[currentState](delta);
-//     }
-//   },
-//   delta => {
-//     // Move to bottom
-//   }
-// ]
-
 let moveState = 0;
 const move = [
-  delta => {
+  (delta, speed) => {
     if (sprite.x <= 25 && sprite.y >= yMid) {
       moveState = 1;
-      move[moveState](delta);
+      move[moveState](delta, speed);
       return;
     }
-    sprite.x = sprite.x > 25 ? sprite.x - delta : sprite.x;
-    sprite.y = sprite.y < yMid ? sprite.y + delta : sprite.y;
+    sprite.x = sprite.x > 0 ? sprite.x - ( speed * 100 * delta / yMid ) : sprite.x;
+    sprite.y = sprite.y < yMid ? sprite.y + ( speed * 100 * delta / xMid ) : sprite.y;
   },
-  delta => {
+  (delta, speed) => {
     if (sprite.x >= xMid && sprite.y >= yMax - 25) {
       moveState = 2;
-      move[moveState](delta);
+      move[moveState](delta, speed);
       return;
     }
-    sprite.x = sprite.x < xMid ? sprite.x + delta : sprite.x;
-    sprite.y = sprite.y < yMax - 25 ? sprite.y + delta : sprite.y;
+    sprite.x = sprite.x < xMid ? sprite.x + ( speed * 100 * delta / yMid ) : sprite.x;
+    sprite.y = sprite.y < yMax - 25 ? sprite.y + ( speed * 100 * delta / xMid ) : sprite.y;
   },
-  delta => {
-
+  (delta, speed) => {
+    if (sprite.x >= xMax - 25 && sprite.y <= yMid) {
+      moveState = 3;
+      move[moveState](delta, speed);
+      return;
+    }
+    sprite.x = sprite.x < xMax - 25 ? sprite.x + ( speed * 100 * delta / yMid ) : sprite.x;
+    sprite.y = sprite.y > yMid ? sprite.y - ( speed * 100 * delta / xMid ) : sprite.y;
+  },
+  (delta, speed) => {
+    if (sprite.x <= xMid && sprite.y <= 25) {
+      moveState = 0;
+      move[moveState](delta, speed);
+      return;
+    }
+    sprite.x = sprite.x > xMid ? sprite.x - ( speed * 100 * delta / yMid ) : sprite.x;
+    sprite.y = sprite.y > 0 ? sprite.y - ( speed * 100 * delta / xMid ) : sprite.y;
   }
 ]
 let rotateState = 0;
@@ -100,7 +78,8 @@ export default defineComponent({
   data () {
     return ({
       fps: 0,
-      elapsedSec: 0
+      elapsedSec: 0,
+      speed: 1
     })
   },
   mounted () {
@@ -119,7 +98,7 @@ export default defineComponent({
         uiUpdate++;
       }
       // Move the Sprite
-      move[moveState](delta);
+      move[moveState](delta, this.speed);
       rotate[rotateState](delta);
     });
   },
