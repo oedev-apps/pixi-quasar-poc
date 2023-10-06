@@ -1,8 +1,21 @@
 <template>
   <q-page class="flex flex-center" :style-fn="setOffset">
     <div ref="pixiContainer" class="pixi-canvas-container" style="border: 1px solid greenyellow;"></div>
-    <q-card flat class="absolute-bottom q-mb-sm q-mx-sm q-px-xs row text-white" style="background-color: rgba(0, 0, 0, 0);">
-      <div class="col">FPS: {{ fps }}</div> <div class="col">Elapsed: {{ elapsedSec }}s</div>
+    <q-card flat class="absolute-bottom q-mb-sm q-mx-sm q-px-xs text-white" style="background-color: rgba(0, 0, 0, 0);">
+      <div class="row q-px-lg">
+        <q-badge>Speed</q-badge>
+        <q-slider
+          v-model="speed"
+          :min="1"
+          :max="10"
+          :step="1"
+          snap dark label=""
+        />
+      </div>
+      <div class="row q-px-lg">
+        <div class="col">FPS: {{ fps }}&nbsp;</div>
+        <div class="col">Elapsed: {{ elapsedSec }}s</div>
+      </div>
     </q-card>
   </q-page>
 </template>
@@ -68,10 +81,6 @@ const move = [
     sprite.y = sprite.y > 0 ? sprite.y - ( speed * 100 * delta / xMid ) : sprite.y;
   }
 ]
-let rotateState = 0;
-const rotate = [
-  delta => {}
-]
 
 export default defineComponent({
   name: 'IndexPage',
@@ -79,7 +88,7 @@ export default defineComponent({
     return ({
       fps: 0,
       elapsedSec: 0,
-      speed: 1
+      speed: 5
     })
   },
   mounted () {
@@ -99,7 +108,6 @@ export default defineComponent({
       }
       // Move the Sprite
       move[moveState](delta, this.speed);
-      rotate[rotateState](delta);
     });
   },
   methods: {
